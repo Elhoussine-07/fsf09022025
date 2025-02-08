@@ -109,16 +109,14 @@ export function Home() {
 </div>
 
 
-      {/* Courses Section */}
-      <section id="courses" className="py-20">
+<section id="courses" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="relative text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent glow-title">
-        Nos Cours
-</h2>
+          <h2 className="relative text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent glow-title">
+            Nos Formations
+          </h2>
 
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* AP1 Card */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Cycle Préparatoire */}
             <div className="group relative overflow-hidden rounded-2xl">
               <div 
                 className="absolute inset-0 bg-gradient-to-br from-blue-900 to-black transition-transform duration-500 group-hover:scale-110"
@@ -130,47 +128,71 @@ export function Home() {
                 }}
               ></div>
               <div className="relative p-8 min-h-[300px] flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent">
-                <h3 className="text-3xl font-bold mb-4">Première Année (AP1)</h3>
+                <h3 className="text-3xl font-bold mb-4">Cycle Préparatoire</h3>
                 <p className="text-gray-300 mb-6">
-                  Découvrez les fondamentaux des sciences de l'ingénieur à travers nos modules de première année.
+                  Les fondamentaux des sciences de l'ingénieur (AP1 & AP2)
                 </p>
-                <Link 
-                  to="/ap1" 
-                  className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  Explorer les cours <ChevronRight className="ml-2 h-5 w-5" />
-                </Link>
+                <div className="flex gap-4">
+  <Link to="/AP1" className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+    AP1 <ChevronRight className="ml-2 h-5 w-5" />
+  </Link>
+  <Link to="/AP2" className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+    AP2 <ChevronRight className="ml-2 h-5 w-5" />
+  </Link>
+</div>
               </div>
             </div>
 
-            {/* AP2 Card */}
+            {/* Cycle Ingénieur */}
             <div className="group relative overflow-hidden rounded-2xl">
               <div 
                 className="absolute inset-0 bg-gradient-to-br from-blue-900 to-black transition-transform duration-500 group-hover:scale-110"
                 style={{
-                  backgroundImage: `url('https://images.unsplash.com/photo-1517134191118-9d595e4c8c2b?auto=format&fit=crop&q=80')`,
+                  backgroundImage: `url('https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&q=80')`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundBlendMode: 'overlay'
                 }}
               ></div>
               <div className="relative p-8 min-h-[300px] flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent">
-                <h3 className="text-3xl font-bold mb-4">Deuxième Année (AP2)</h3>
+                <h3 className="text-3xl font-bold mb-4">Cycle Ingénieur</h3>
                 <p className="text-gray-300 mb-6">
-                  Approfondissez vos connaissances avec nos modules avancés de deuxième année.
+                  Spécialisations en génie (BTP, GI, GM, FID, GE)
+                </p>
+                <Link to="/engineering" className="text-blue-400 hover:text-blue-300 transition-colors">
+  Cycle d'Ingénieur
+  </Link>
+              </div>
+            </div>
+
+            {/* Resources */}
+            <div className="group relative overflow-hidden rounded-2xl">
+              <div 
+                className="absolute inset-0 bg-gradient-to-br from-blue-900 to-black transition-transform duration-500 group-hover:scale-110"
+                style={{
+                  backgroundImage: `url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundBlendMode: 'overlay'
+                }}
+              ></div>
+              <div className="relative p-8 min-h-[300px] flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent">
+                <h3 className="text-3xl font-bold mb-4">Espace profissionnelle</h3>
+                <p className="text-gray-300 mb-6">
+                  suivez-nous 
                 </p>
                 <Link 
-                  to="/ap2" 
+                  to="/resources" 
                   className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
                 >
-                  Explorer les cours <ChevronRight className="ml-2 h-5 w-5" />
+                  Voir les ressources <ChevronRight className="ml-2 h-5 w-5" />
                 </Link>
               </div>
             </div>
           </div>
         </div>
-      </section>
-
+      </section>      
+      
       {/* Footer */}
       <footer id="contact" className="bg-black/30 backdrop-blur-sm border-t border-white/10 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

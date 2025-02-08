@@ -1,16 +1,23 @@
 import { ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';  // Importer useNavigate
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { moduleData } from '../data/modules';
 
 export function AP2() {
   const { AP2: { S3, S4 } } = moduleData;
+  const navigate = useNavigate();  // Déclare le hook
+
+  const handleModuleClick = (moduleCode: string) => {
+    // Redirection vers la page des matériaux de cours avec le paramètre 'module' dans l'URL
+    navigate(`/CourseMaterials?module=${moduleCode}`);
+  };
 
   const renderModule = (module: any) => (
     <div
       key={module.code}
       className="group relative overflow-hidden rounded-xl bg-black/30 backdrop-blur-sm border border-white/10 hover:border-blue-500/50 transition-all duration-300"
+      onClick={() => handleModuleClick(module.code)}  // Ajouter un clic qui appelle handleModuleClick
     >
       <div 
         className="absolute inset-0 opacity-20 transition-transform duration-500 group-hover:scale-110"
@@ -32,7 +39,6 @@ export function AP2() {
             ))}
           </ul>
         )}
-        
       </div>
     </div>
   );

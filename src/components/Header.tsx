@@ -15,6 +15,7 @@ export function Header() {
           <nav className="hidden md:flex space-x-8">
             <Link to="/ap1" className="text-gray-300 hover:text-white transition">AP1</Link>
             <Link to="/ap2" className="text-gray-300 hover:text-white transition">AP2</Link>
+            <Link to="/engineering" className="text-gray-300 hover:text-white transition">CI1</Link>
             <a href="#contact" className="text-gray-300 hover:text-white transition">Contact</a>
           </nav>
         </div>

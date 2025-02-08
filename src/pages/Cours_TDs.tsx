@@ -1,114 +1,183 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, Book, FileText, TestTube, ArrowLeft, Search } from 'lucide-react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { moduleData } from '../data/modules';
+import { ChevronRight, Book, FileText, TestTube, FilePlus, ArrowLeft } from 'lucide-react';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import { moduleData } from '../data/modules'; // Assure-toi que les données sont correctement définies
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 
-type MaterialType = 'cours' | 'td' | 'ds';
+type MaterialType = 'cours' | 'td' | 'ds' | 'extra';
+
+type FileType = {
+  id: string;
+  name: string;
+  mimeType: string;
+};
 
 export function CourseMaterials() {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
+
   const moduleParam = searchParams.get('module');
   const typeParam = searchParams.get('type') as MaterialType | null;
 
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<MaterialType | null>(typeParam);
+  const [files, setFiles] = useState<FileType[]>([]);
+
+  const md = location.state?.id ?? 'S1';
+
+  const [modul, setModule] = useState<any>({
+    'S1': moduleData?.AP1?.S1 || [],
+    'S2': moduleData?.AP1?.S2 || [],
+    'S3': moduleData?.AP2?.S3 || [],
+    'S4': moduleData?.AP2?.S4 || []
+  });
 
   useEffect(() => {
-    if (typeParam) {
-      setSelectedType(typeParam);
+    if (selectedType && moduleParam && modul[md]) {
+      const module = modul[md].find((mod: { code: string; }) => mod.code === moduleParam);
+      if (module && module.details[selectedType] && module.details[selectedType].googleDriveFolderId) {
+        const folderId = module.details[selectedType].googleDriveFolderId;
+        const apiKey = 'AIzaSyACQLVbDM6D2wEdDWVzWyrA1Ig9p8ujluk'; // Remplace par ta clé API
+        const query = encodeURIComponent(`'${folderId}' in parents`);
+        const url = `https://www.googleapis.com/drive/v3/files?q=${query}&key=${apiKey}&fields=files(id,name,mimeType)`;
+
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            if (data.files) {
+              setFiles(data.files.filter((file: any) => file.mimeType === 'application/pdf'));
+            } else {
+              console.error('Aucun fichier trouvé pour ce dossier.');
+              setFiles([]);
+            }
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération des fichiers :', error);
+          });
+      }
     }
-  }, [typeParam]);
+  }, [selectedType, moduleParam, md, modul]);
 
   const allModules = [
-    ...moduleData.AP1.S1,
-    ...moduleData.AP1.S2
+    ...modul['S1'],
+    ...modul['S2'],
+    ...modul['S3'],
+    ...modul['S4']
   ];
 
   const filteredModules = allModules.filter(module => {
-    const matchesSearch = (
-      module.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      module.code.toLowerCase().includes(searchTerm.toLowerCase())
-    );
     const matchesModule = moduleParam ? module.code === moduleParam : true;
-    return matchesSearch && matchesModule;
+    return matchesModule;
   });
 
   const MaterialTypeButton = ({ type, icon: Icon }: { type: MaterialType; icon: any }) => (
     <button
       onClick={() => setSelectedType(selectedType === type ? null : type)}
-      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-        selectedType === type ? 'bg-blue-600 text-white' : 'bg-black/30 text-gray-300 hover:bg-black/40'
-      }`}
+      className={`material-button flex items-center space-x-3 px-8 py-4 rounded-2xl ${selectedType === type ? 'bg-gradient-to-r from-blue-600 to-blue-400 shadow-lg shadow-blue-500/30' : 'glass-card hover:bg-white/20'}`}
     >
-      <Icon className="h-4 w-4" />
-      <span className="capitalize">{type}</span>
+      <Icon className={`h-6 w-6 ${selectedType === type ? 'text-white' : 'text-blue-400'}`} />
+      <span className={`capitalize text-lg font-medium ${selectedType === type ? 'text-white' : 'text-blue-400'}`}>
+        {type}
+      </span>
     </button>
   );
 
-  const filterDetails = (details: any[]) => {
-    if (!selectedType) return details;
-    return details.filter(detail => detail.name.toLowerCase().includes(selectedType.toLowerCase()));
+  const filterDetailsByType = (module: any) => {
+    console.log('Type sélectionné:', selectedType);
+    console.log('Fichiers disponibles:', files);
+
+    if (!selectedType) return [];
+
+    if (files.length > 0) {
+      return files.map((file: FileType, index: number) => (
+        <div 
+          key={index} 
+          className="flex items-center py-3 px-4 rounded-lg hover:bg-white/5 transition-colors group"
+        >
+          <ChevronRight className="h-5 w-5 mr-3 text-blue-400 group-hover:translate-x-1 transition-transform" />
+          <a 
+            href={`https://drive.google.com/file/d/${file.id}/view`} 
+            target="_blank" 
+            className="text-lg text-blue-400 hover:text-blue-300 transition-all group-hover:underline"
+          >
+            {file.name}
+          </a>
+        </div>
+      ));
+    }
+
+    return (
+      <div className="text-gray-400 text-sm italic px-4 py-3">
+        Aucun fichier disponible pour ce type.
+      </div>
+    );
   };
 
   return (
     <div className="min-h-screen bg-[#020817] text-white">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex items-center space-x-4 mb-8">
-          <button 
-            onClick={() => navigate(-1)}
-            className="flex items-center text-blue-400 hover:text-blue-300"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </button>
-        </div>
-
-        <h1 className="year-title mb-12">
-          Ressources Pédagogiques {moduleParam && ` - ${moduleParam}`}
-        </h1>
-
-        <div className="mb-8 space-y-6">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Rechercher un module..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-black/30 text-white outline-none"
-            />
-            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+      <Header />
+      <main className="pt-24 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-4 mb-8">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center text-blue-400 hover:text-blue-300 transition-colors group"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+              <span className="text-lg">Retour</span>
+            </button>
           </div>
 
-          <div className="flex flex-wrap gap-4">
-            <MaterialTypeButton type="cours" icon={Book} />
-            <MaterialTypeButton type="td" icon={FileText} />
-            <MaterialTypeButton type="ds" icon={TestTube} />
+          <div className="text-center space-y-4">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
+              Ressources Pédagogiques
+            </h1>
+            {moduleParam && (
+              <h2 className="text-2xl text-white/80">
+                Module {moduleParam}
+              </h2>
+            )}
           </div>
-        </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredModules.map((module) => (
-            <div key={module.code} className="relative p-6 rounded-xl bg-black/40">
-              <h3 className="text-xl font-bold text-white">{module.code} - {module.name}</h3>
-              <div className="space-y-2">
-                {filterDetails(module.details).map((detail: any, index: number) => (
-                  <div key={index} className="flex items-center">
-                    <ChevronRight className="h-4 w-4 mr-2 text-blue-400" />
-                    <a href={detail.Link} target="_blank" className="text-blue-400">{detail.name}</a>
-                  </div>
-                ))}
-              </div>
+          <div className="space-y-8">
+            <div className="flex flex-wrap gap-4 justify-center">
+              <MaterialTypeButton type="cours" icon={Book} />
+              <MaterialTypeButton type="td" icon={FileText} />
+              <MaterialTypeButton type="ds" icon={TestTube} />
+              <MaterialTypeButton type="extra" icon={FilePlus} />
             </div>
-          ))}
-        </div>
-
-        {filteredModules.length === 0 && (
-          <div className="text-center text-gray-400 mt-8">
-            Aucun module ne correspond à votre recherche
           </div>
-        )}
-      </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredModules.length > 0 ? (
+              filteredModules.map((module) => (
+                <div 
+                  key={module.code} 
+                  className="glass-card rounded-2xl p-6 transform transition-all duration-300 hover:scale-[1.02] hover:bg-white/15"
+                >
+                  <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 text-transparent bg-clip-text">
+                    {module.code} - {module.name}
+                  </h3>
+                  <div className="space-y-2">
+                    {filterDetailsByType(module)}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <div className="glass-card inline-block px-8 py-4 rounded-xl">
+                  <p className="text-lg text-white/60">
+                    Aucun module ne correspond à votre recherche
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }

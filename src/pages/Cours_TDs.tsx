@@ -114,6 +114,45 @@ export function CourseMaterials() {
     );
   };
 
+  const renderSubModules = (module: any) => {
+    if (module.subModules && module.subModules.length > 0) {
+      return (
+        <div className="mt-4">
+          <h4 className="text-lg font-semibold text-white">Sous-modules :</h4>
+          <ul className="text-gray-300 space-y-1 mt-2">
+            {module.subModules.map((subModule: any, index: number) => (
+              <li key={index} className="flex flex-col">
+                <div className="flex items-center">
+                  <ChevronRight className="h-4 w-4 mr-2 text-blue-400" />
+                  {subModule.name}
+                </div>
+
+                {/* Afficher les fichiers PDF associés à ce sous-module */}
+                {files.length > 0 && subModule.files?.length > 0 && (
+                  <ul className="text-gray-300 mt-2 pl-6">
+                    {subModule.files.map((subFile: any, subIndex: number) => (
+                      <li key={subIndex} className="flex items-center py-1">
+                        <ChevronRight className="h-4 w-4 mr-2 text-blue-400" />
+                        <a 
+                          href={`https://drive.google.com/file/d/${subFile.id}/view`} 
+                          target="_blank" 
+                          className="text-blue-400 hover:text-blue-300 transition-all group-hover:underline"
+                        >
+                          {subFile.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-[#020817] text-white">
       <Header />
@@ -161,6 +200,7 @@ export function CourseMaterials() {
                   </h3>
                   <div className="space-y-2">
                     {filterDetailsByType(module)}
+                    {renderSubModules(module)} {/* Ajouter les sous-modules ici */}
                   </div>
                 </div>
               ))

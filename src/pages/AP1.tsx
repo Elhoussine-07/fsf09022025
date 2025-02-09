@@ -1,26 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { moduleData } from "../data/modules";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 export function AP1() {
   const { AP1: { S1 = [], S2 = [] } } = moduleData;
   const navigate = useNavigate();
 
+  useEffect(() => {
+    AOS.init();
+  }, []);
+
   // Fonction pour afficher les modules
-  const renderModule = (module: any) => {
+  const renderModule = (module: any, semester: string) => {
     if (!module || !module.code || !module.name) {
       return <p>Module invalide</p>; // Gérer le cas où le module est incomplet
     }
-    
+
     return (
       <div
         key={module.code}
         className="group relative overflow-hidden rounded-xl bg-black/30 backdrop-blur-sm border border-white/10 hover:border-blue-500/50 transition-all duration-300"
-        onClick={() => navigate(`/CourseMaterials?module=${module.code}`, { state: { id: "S1" } })}
+        onClick={() => navigate(`/CourseMaterials?module=${module.code}`, { state: { id: semester } })}
         aria-label={`Accéder aux ressources pour le module ${module.code} - ${module.name}`}
+        data-aos="fade-in-out" data-aos-delay="50" data-aos-duration="700" data-aos-easing="ease-in-out"
       >
         <div
           className="absolute inset-0 opacity-20 transition-transform duration-500 group-hover:scale-110"
@@ -44,6 +51,21 @@ export function AP1() {
               ))}
             </ul>
           )}
+
+          {/* Affichage des sous-modules */}
+          {module.subModules && module.subModules.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-lg font-semibold text-white">Sous-modules :</h4>
+              <ul className="text-gray-300 space-y-1 mt-2">
+                {module.subModules.map((subModule: any, index: number) => (
+                  <li key={index} className="flex items-center">
+                    <ChevronRight className="h-4 w-4 mr-2 text-blue-400" />
+                    {subModule.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -54,7 +76,7 @@ export function AP1() {
       <Header />
       
       <main className="pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="fade-in-out" data-aos-delay="50" data-aos-duration="700" data-aos-easing="ease-in-out">
           <div className="flex items-center space-x-4 mb-8">
             <Link to="/" className="text-blue-400 hover:text-blue-300 transition-colors" aria-label="Retour à la page d'accueil">
               Accueil
@@ -70,17 +92,17 @@ export function AP1() {
           <div className="space-y-16">
             {/* Section pour le Semestre 1 */}
             <section>
-              <h2 className="text-2xl font-semibold mb-8 text-center text-blue-300">Semestre 1</h2>
+              <h2 className="text-2xl font-semibold mb-8 text-center text-blue-300" data-aos="fade-in-out" data-aos-delay="50" data-aos-duration="700" data-aos-easing="ease-in-out">Semestre 1</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {S1.length > 0 ? S1.map(renderModule) : <p>Aucun module disponible pour le semestre 1</p>}
+                {S1.length > 0 ? S1.map(module => renderModule(module, "S1")) : <p>Aucun module disponible pour le semestre 1</p>}
               </div>
             </section>
 
             {/* Section pour le Semestre 2 */}
             <section>
-              <h2 className="text-2xl font-semibold mb-8 text-center text-blue-300">Semestre 2</h2>
+              <h2 className="text-2xl font-semibold mb-8 text-center text-blue-300" data-aos="fade-in-out" data-aos-delay="50" data-aos-duration="700" data-aos-easing="ease-in-out">Semestre 2</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {S2.length > 0 ? S2.map(renderModule) : <p>Aucun module disponible pour le semestre 2</p>}
+                {S2.length > 0 ? S2.map(module => renderModule(module, "S2")) : <p>Aucun module disponible pour le semestre 2</p>}
               </div>
             </section>
           </div>
